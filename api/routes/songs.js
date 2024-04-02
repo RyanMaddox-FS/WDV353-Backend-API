@@ -3,11 +3,10 @@ const mongoose = require('mongoose');
 const router = express.Router();
 
 const Song = require('../models/song');
-const { update } = require('../models/song');
 
 // HTTP GET
-router.get('/', (req, res, next) => {
-  Song.find({})
+router.get('/', async (req, res, next) => {
+ await Song.find({})
     .then((songList) => {
       res.status(200).json({
         message: `Song Collection`,
@@ -24,19 +23,14 @@ router.get('/', (req, res, next) => {
 });
 
 // HTTP GET by ID
-router.get('/:songId', (req, res, next) => {
+router.get('/:songId', async (req, res, next) => {
   const { songId } = req.params;
 
-  Song.findById({ _id: songId })
-    .then((result) => {
+ await Song.findById({ _id: songId })
+    .then((songInfo) => {
       res.status(200).json({
         message: `Song selected`,
-        song: {
-          id: result._id,
-          title: result.title,
-          artist: result.artist,
-          album: result.album,
-        },
+        songInfo,
         metadata: {
           host: req.hostname,
           method: req.method,
@@ -53,20 +47,20 @@ router.get('/:songId', (req, res, next) => {
 });
 
 // HTTP POST
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res, next) => {
   const newSong = new Song({
-    _id: mongoose.Types.ObjectId(),
+    _id: new mongoose.Types.ObjectId(),
     title: req.body.title,
     artist: req.body.artist,
     album: req.body.album,
   });
 
-  newSong
+ await newSong
     .save()
-    .then((result) => {
+    .then((songInfo) => {
       res.status(201).json({
         message: `Song submitted`,
-        result,
+        songInfo,
         metadata: {
           host: req.hostname,
           method: req.method,
@@ -83,7 +77,7 @@ router.post('/', (req, res, next) => {
 });
 
 // HTTP PATCH (by ID)
-router.patch('/:songId', (req, res, next) => {
+router.patch('/:songId', async (req, res, next) => {
   const { songId } = req.params;
 
   const updateSong = {
@@ -92,22 +86,15 @@ router.patch('/:songId', (req, res, next) => {
     album: req.body.album,
   };
 
-  Song.updateOne(
+ await Song.findOneAndUpdate(
     { _id: songId },
-    {
-      $set: updateSong,
-    }
+    updateSong,
+    {new: true}
   )
-    .then((result) => {
+    .then((songInfo) => {
       res.status(200).json({
         message: `Song updated`,
-        result,
-        song: {
-          id: songId,
-          title: updateSong.title,
-          artist: updateSong.artist,
-          album: updateSong.album,
-        },
+        songInfo,
         metadata: {
           host: req.hostname,
           method: req.method,
@@ -124,20 +111,14 @@ router.patch('/:songId', (req, res, next) => {
 });
 
 // HTTP DELETE (by ID)
-router.delete('/:songId', (req, res, next) => {
+router.delete('/:songId', async (req, res, next) => {
   const { songId } = req.params;
 
-  const deleteSong = {
-    title: req.body.title,
-    artist: req.body.artist,
-    album: req.body.album,
-  };
-
-  Song.findByIdAndDelete({ _id: songId }, { $set: deleteSong })
-    .then((result) => {
+ await Song.findOneAndDelete({ _id: songId })
+    .then((songInfo) => {
       res.status(200).json({
         message: `Song deleted`,
-        result,
+        songInfo,
         metadata: {
           host: req.hostname,
           method: req.method,
@@ -152,3 +133,4 @@ router.delete('/:songId', (req, res, next) => {
       });
     });
 });
+module.exports = router;
