@@ -9,11 +9,11 @@ const songRoutes = require('../api/routes/songs');
  * Middleware
  */
 
-// Parsing (similar to body-parser)
-app.use(express.urlencoded({ extended: true }));
-
 // Parsing JSON request
 app.use(express.json());
+
+// Parsing (similar to body-parser)
+app.use(express.urlencoded({ extended: true }));
 
 // CORS
 app.use((req, res, next) => {
@@ -57,10 +57,9 @@ app.use((error, req, res, next) => {
 });
 
 // Connecting to MongoDB
-mongoose.connect(process.env.MONGODBURL, (err) => {
-  err
-    ? console.error(`Error: ${err.message}`)
-    : console.log(`MongoDB connection successful`);
-});
+mongoose
+  .connect(process.env.MONGODBURL)
+  .catch((err) => (err ?     
+console.error(`Error: ${err.message}`) : console.log(`MongoDB connection successful`)));
 
 module.exports = app;
