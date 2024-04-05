@@ -110,7 +110,7 @@ router.patch('/:artistId', async (req, res, next) => {
 });
 
 // HTTP DELETE (by ID)
-router.delete('/:songId', async (req, res, next) => {
+router.delete('/:artistId', async (req, res, next) => {
   const { artistId } = req.params;
 
   await Artist.findOneAndDelete({ _id: artistId })
