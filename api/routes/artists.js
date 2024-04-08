@@ -89,6 +89,7 @@ router.post("/", async (req, res, next) => {
         albumName: req.body.albumName,
         albumYear: req.body.albumYear,
         ep: req.body.ep,
+        song: req.body.song,
       });
 
       newArtist
